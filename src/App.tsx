@@ -7,7 +7,6 @@ import { useEffect } from 'react';
   import { NpmSchedulePage } from './pages/NpmSchedulePage';
   import { FormatterPage } from './pages/FormatterPage';
   import { CommentSwiperPage } from './pages/CommentSwiperPage';
-  import { CommentSwiperResultPage } from './pages/CommentSwiperResultPage';
   import { RegexLibraryPage } from './pages/RegexLibraryPage';
   import { RegexDebuggerPage } from './pages/RegexDebuggerPage';
   import { RegexVisualizerPage } from './pages/RegexVisualizerPage';
@@ -74,7 +73,6 @@ import { useEffect } from 'react';
             <Route path="npm-schedule" element={<NpmSchedulePage />} />
             <Route path="formatter" element={<FormatterPage />} />
             <Route path="comment-swiper" element={<CommentSwiperPage />} />
-+           <Route path="comment-swiper/result" element={<CommentSwiperResultPage />} />
             <Route path="regex-library" element={<RegexLibraryPage />} />
             <Route path="regex-debugger" element={<RegexDebuggerPage />} />
             <Route path="regex-visualizer" element={<RegexVisualizerPage />} />
