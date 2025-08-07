@@ -6,7 +6,7 @@ export function MainLayout() {
   const drawerWidth = 200;
 
   return (
-    <Box sx={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <Box sx={{ display: 'flex', height: '100vh' }}>
       <CssBaseline />
       <Sidebar />
       <Box
@@ -16,7 +16,7 @@ export function MainLayout() {
           p: 0,
           width: { sm: `calc(100% - ${drawerWidth}px)` },
           backgroundColor: '#222',
-          overflow: 'hidden'
+          overflowY: 'auto'
         }}
       >
         <Outlet />
