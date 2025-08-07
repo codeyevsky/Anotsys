@@ -174,7 +174,6 @@ export function CommentSwiperPage() {
     if (animatedResult) {
       try {
         await navigator.clipboard.writeText(animatedResult);
-        alert("Kod panoya kopyalandı!");
       } catch (err) {
         console.error("Failed to copy text: ", err);
       }
@@ -190,7 +189,7 @@ export function CommentSwiperPage() {
       </Box>
       <MainContent>
         <Typography variant="h4" component="h2" color="#00bcd4" sx={{ lineHeight: '0.47', fontWeight: 'bold', mb: 2 }}>
-            Comment Swiper
+          Comment Swiper
         </Typography>
         <Typography variant="body1" sx={{ color: "#aaa", mb: 2 }}>
           Easily clean up comments in your code for a professional look.
@@ -202,13 +201,13 @@ export function CommentSwiperPage() {
               id="language-select-label"
               sx={{ color: '#aaa', transition: 'color 0.2s ease-in-out' }}
             >
-              Dil Seçin
+              Select Language
             </InputLabel>
             <Select
               labelId="language-select-label"
               id="language-select"
               value={language}
-              label="Dil Seçin"
+              label="Select Language"
               onChange={(e) => {
                 setLanguage(e.target.value as Language);
               }}
@@ -217,7 +216,7 @@ export function CommentSwiperPage() {
                 transition: 'border-color 0.2s ease-in-out',
                 '.MuiOutlinedInput-notchedOutline': { borderColor: '#333' },
                 '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#00bcd4' },
-                '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#00bcd4' },
+                '&.Mui-focused .MuiOutlinedInput-notcheOutline': { borderColor: '#00bcd4' },
                 '.MuiSvgIcon-root': { color: '#fff' },
               }}
               MenuProps={{
@@ -255,12 +254,12 @@ export function CommentSwiperPage() {
 
         <Box>
           <Typography variant="h6" gutterBottom>
-            Temizlenecek Kodu Girin
+            Enter Code to be Cleaned
           </Typography>
           <StyledTextarea
             value={code}
             onChange={(e) => setCode(e.target.value)}
-            placeholder="Kodunuzu buraya yapıştırın..."
+            placeholder="Paste your code here..."
           />
         </Box>
         <ButtonGroup>
@@ -273,7 +272,7 @@ export function CommentSwiperPage() {
               "&:hover": { backgroundColor: "#444" },
             }}
           >
-            Yapıştır
+            Paste
           </Button>
           {isProcessing ? (
             <Button
@@ -286,7 +285,7 @@ export function CommentSwiperPage() {
                 "&:hover": { backgroundColor: "#b71c1c" },
               }}
             >
-              İptal Et
+              Cancel
             </Button>
           ) : (
             <Button
@@ -300,20 +299,20 @@ export function CommentSwiperPage() {
                 "&:hover": { backgroundColor: "#0097a7" },
               }}
             >
-              Yorumları Temizle
+              Clean Comments
             </Button>
           )}
         </ButtonGroup>
         <Box>
           <Typography variant="h6" gutterBottom>
-            Sonuç
+            Result
           </Typography>
           {animatedResult ? (
             <>
               <StyledTextarea
                 value={animatedResult}
                 readOnly
-                placeholder="Temizlenmiş kod burada görünecek..."
+                placeholder="Cleaned code will appear here..."
               />
               <Box sx={{ mt: 1, display: "flex", justifyContent: "flex-end" }}>
                 <Button
@@ -326,14 +325,14 @@ export function CommentSwiperPage() {
                     "&:hover": { backgroundColor: "#444" },
                   }}
                 >
-                  Kopyala
+                  Copy
                 </Button>
               </Box>
             </>
           ) : (
             <ResultCard>
               <Typography variant="body1">
-                Sonuçlarınız burada çıkacak.
+                Your results will appear here.
               </Typography>
             </ResultCard>
           )}
