@@ -23,6 +23,9 @@
     }
   },
   "plugins": {
+    "clipboard": {
+      "provider": "plugin-clipboard"
+    },
     "shell": {
       "open": false
     }

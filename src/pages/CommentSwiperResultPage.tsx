@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { Box, Typography, Button, TextareaAutosize, styled } from '@mui/material';
-import ContentPasteIcon from '@mui/icons-material/ContentPaste';
-import ClearIcon from '@mui/icons-material/Clear';
-import { useNavigate } from 'react-router-dom';
+import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import ReplayIcon from '@mui/icons-material/Replay';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const StyledTextarea = styled(TextareaAutosize)({
   width: 'calc(100% - 6px)',
@@ -22,61 +21,41 @@ const StyledTextarea = styled(TextareaAutosize)({
   },
 });
 
-export function CommentSwiperPage() {
-  const [code, setCode] = useState('');
+export function CommentSwiperResultPage() {
+  const location = useLocation();
   const navigate = useNavigate();
+  const result = location.state?.result || '';
 
-  const handleClearComments = () => {
-    // This is a simple implementation. A more robust regex would be needed for production.
-    const codeWithoutComments = code.replace(/\/\/.*|\/\*[\s\S]*?\*\//g, '').trim();
-    navigate('/comment-swiper/result', { state: { result: codeWithoutComments } });
+  const handleCopyCode = () => {
+    navigator.clipboard.writeText(result);
+    alert('Kod kopyalandı!');
   };
 
-  const handlePaste = async () => {
-    try {
-      const text = await navigator.clipboard.readText();
-      setCode(text);
-    } catch (err) {
-      console.error('Failed to read clipboard contents: ', err);
-    }
+  const handleGoBack = () => {
+    navigate('/comment-swiper');
   };
 
   return (
     <Box sx={{ backgroundColor: '#222', color: 'white', height: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Box sx={{ p: 3, backgroundColor: '#1e1e1e', borderBottom: '1px solid #444', lineHeight: '0.47' }}>
         <Typography variant="h4" component="div" color="white" sx={{ lineHeight: '0.47' }}>
-          Comment Swiper
+          Comment Swiper Sonuç
         </Typography>
         <Typography variant="body2" component="div" sx={{ color: '#aaa' }}>
-          Kodunuzdaki yorumları temizleyin.
+          Yorumları temizlenmiş kodunuz.
         </Typography>
       </Box>
       <Box sx={{ p: 3, flexGrow: 1, display: 'flex', flexDirection: 'column', gap: 2 }}>
         <StyledTextarea
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          placeholder="Kodunuzu buraya yapıştırın..."
+          value={result}
+          readOnly
         />
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
           <Button
             variant="contained"
-            startIcon={<ContentPasteIcon />}
-            onClick={handlePaste}
-            sx={{
-              backgroundColor: '#444',
-              '&:hover': {
-                backgroundColor: '#555',
-              },
-            }}
-          >
-            Yapıştır
-          </Button>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<ClearIcon />}
-            onClick={handleClearComments}
-            disabled={!code}
+            startIcon={<ContentCopyIcon />}
+            onClick={handleCopyCode}
+            disabled={!result}
             sx={{
               backgroundColor: '#00bcd4',
               '&:hover': {
@@ -84,7 +63,20 @@ export function CommentSwiperPage() {
               },
             }}
           >
-            Yorumları Temizle
+            Kodu Kopyala
+          </Button>
+          <Button
+            variant="contained"
+            startIcon={<ReplayIcon />}
+            onClick={handleGoBack}
+            sx={{
+              backgroundColor: '#444',
+              '&:hover': {
+                backgroundColor: '#555',
+              },
+            }}
+          >
+            Tekrar
           </Button>
         </Box>
       </Box>

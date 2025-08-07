@@ -1,15 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Collapse, Typography,} from "@mui/material";
-import ExpandLess from "@mui/icons-material/ExpandLess";
-import ExpandMore from "@mui/icons-material/ExpandMore";
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Typography,} from "@mui/material";
 import HubIcon from "@mui/icons-material/Hub";
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
 import CommentIcon from "@mui/icons-material/Comment";
-import CodeIcon from "@mui/icons-material/Code";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import AccessAlarmIcon from "@mui/icons-material/AccessAlarm";
-import FiberManualRecordIcon from "@mui/icons-material/FiberManualRecord";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import BugReportIcon from "@mui/icons-material/BugReport";
 import VisibilityIcon from "@mui/icons-material/Visibility";
@@ -17,46 +13,22 @@ import AnotsysLogo from "../assets/anotsys.png";
 
 const drawerWidth = 200;
 
-interface SubItem {
+interface SidebarItem {
   text: string;
   path: string;
   icon: React.ReactElement;
 }
 
-interface SidebarItem {
-  text: string;
-  path?: string;
-  icon: React.ReactElement;
-  isCollapsible?: false;
-}
-
-interface CollapsibleSidebarItem {
-  text: string;
-  path?: string;
-  icon: React.ReactElement;
-  isCollapsible: true;
-  subItems: SubItem[];
-}
-
-type SidebarMenuItem = SidebarItem | CollapsibleSidebarItem;
-
-const sidebarItems: SidebarMenuItem[] = [
+const sidebarItems: SidebarItem[] = [
   {
-    text: "AI Not. Sys.",
+    text: "AI Notification System",
+    path: "/ai-notification-system",
     icon: <HubIcon />,
-    isCollapsible: true,
-    subItems: [
-      {
-        text: "AI Notification System",
-        path: "/ai-notification-system",
-        icon: <FiberManualRecordIcon fontSize="small" />,
-      },
-      {
-        text: "Npm Schedule",
-        path: "/npm-schedule",
-        icon: <FiberManualRecordIcon fontSize="small" />,
-      },
-    ],
+  },
+  {
+    text: "Npm Schedule",
+    path: "/npm-schedule",
+    icon: <AccessAlarmIcon />,
   },
   {
     text: "Formatter",
@@ -69,26 +41,19 @@ const sidebarItems: SidebarMenuItem[] = [
     icon: <CommentIcon />,
   },
   {
-    text: "Regex",
-    icon: <CodeIcon />,
-    isCollapsible: true,
-    subItems: [
-      {
-        text: "Regex Library",
-        path: "/regex-library",
-        icon: <LibraryBooksIcon />,
-      },
-      {
-        text: "Regex Debugger",
-        path: "/regex-debugger",
-        icon: <BugReportIcon />,
-      },
-      {
-        text: "Regex Visualizer",
-        path: "/regex-visualizer",
-        icon: <VisibilityIcon />,
-      },
-    ],
+    text: "Regex Library",
+    path: "/regex-library",
+    icon: <LibraryBooksIcon />,
+  },
+  {
+    text: "Regex Debugger",
+    path: "/regex-debugger",
+    icon: <BugReportIcon />,
+  },
+  {
+    text: "Regex Visualizer",
+    path: "/regex-visualizer",
+    icon: <VisibilityIcon />,
   },
   { text: "To-Do", path: "/todo", icon: <ChecklistIcon /> },
   { text: "Pomodoro", path: "/pomodoro", icon: <AccessAlarmIcon /> },
@@ -96,15 +61,6 @@ const sidebarItems: SidebarMenuItem[] = [
 
 export function Sidebar() {
   const location = useLocation();
-  const [open, setOpen] = useState<Record<string, boolean>>({});
-
-  const handleClick = (itemText: string) => {
-    setOpen((prevOpen) => ({
-      ...prevOpen,
-      [itemText]: !prevOpen[itemText],
-    }));
-  };
-
   const textRefs = useRef<Record<string, HTMLElement>>({});
   const [overflowItems, setOverflowItems] = useState<Record<string, boolean>>({});
 
@@ -117,18 +73,17 @@ export function Sidebar() {
       }
     });
     setOverflowItems(updatedOverflowItems);
-  }, [sidebarItems, open]); // 'open' durumunu bağımlılık dizisine ekledik
+  }, [sidebarItems]);
 
-  const renderSidebarItem = (item: SidebarMenuItem, subItem = false) => {
-    const refKey = `${item.text}-${subItem ? 'sub' : 'main'}`;
+  const renderSidebarItem = (item: SidebarItem) => {
+    const refKey = item.text;
     const isOverflowing = overflowItems[refKey];
 
     return (
       <ListItemButton
-        component={item.path ? Link : 'div'}
-        to={item.path ? item.path : undefined}
+        component={Link}
+        to={item.path}
         selected={location.pathname === item.path}
-        onClick={item.isCollapsible ? () => handleClick(item.text) : undefined}
         sx={{
           borderRadius: 1,
           margin: "0 8px",
@@ -140,7 +95,7 @@ export function Sidebar() {
           },
         }}
       >
-        <ListItemIcon sx={{ color: "#fff", minWidth: subItem ? 20 : 40 }}>
+        <ListItemIcon sx={{ color: "#fff", minWidth: 40 }}>
           {item.icon}
         </ListItemIcon>
         <Box
@@ -163,7 +118,6 @@ export function Sidebar() {
             primary={item.text}
           />
         </Box>
-        {item.isCollapsible && (open[item.text] ? <ExpandLess /> : <ExpandMore />)}
       </ListItemButton>
     );
   };
@@ -204,32 +158,9 @@ export function Sidebar() {
       </Box>
       <List>
         {sidebarItems.map((item) => (
-          <React.Fragment key={item.text}>
-            {item.isCollapsible ? (
-              <>
-                <ListItem disablePadding>
-                  {renderSidebarItem(item)}
-                </ListItem>
-                <Collapse in={open[item.text]} timeout="auto" unmountOnExit>
-                  <List component="div" disablePadding>
-                    {item.subItems.map((subItem) => (
-                      <ListItem
-                        key={subItem.text}
-                        disablePadding
-                        sx={{ pl: 4 }}
-                      >
-                        {renderSidebarItem(subItem, true)}
-                      </ListItem>
-                    ))}
-                  </List>
-                </Collapse>
-              </>
-            ) : (
-              <ListItem key={item.text} disablePadding>
-                {renderSidebarItem(item)}
-              </ListItem>
-            )}
-          </React.Fragment>
+          <ListItem key={item.text} disablePadding>
+            {renderSidebarItem(item)}
+          </ListItem>
         ))}
       </List>
     </Drawer>
