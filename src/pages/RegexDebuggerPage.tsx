@@ -101,6 +101,22 @@ const DebuggerOutputBox = styled(Box)({
   wordWrap: "break-word",
   maxHeight: "600px", // Increased height
   overflowY: "auto",
+
+  "&::-webkit-scrollbar": {
+    width: "12px",
+    backgroundColor: "transparent",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#333",
+    borderRadius: "6px",
+    border: "2px solid #1e1e1e",
+  },
+  "&::-webkit-scrollbar-thumb:hover": {
+    backgroundColor: "#555",
+  },
+  "&::-webkit-scrollbar-track": {
+    backgroundColor: "#1e1e1e",
+  },
 });
 
 interface DebugStep {

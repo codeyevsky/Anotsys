@@ -47,7 +47,7 @@ const StyledTextarea = styled("textarea")({
     width: "12px",
   },
   "&::-webkit-scrollbar-track": {
-    background: "#222",
+    background: "#121212",
   },
   "&::-webkit-scrollbar-thumb": {
     backgroundColor: "#444",

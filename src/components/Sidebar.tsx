@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Typography, TextField, InputAdornment,} from "@mui/material";
+import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Typography, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import HubIcon from "@mui/icons-material/Hub";
 import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
@@ -11,6 +11,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import EventNoteIcon from '@mui/icons-material/EventNote';
 import TimerIcon from '@mui/icons-material/Timer';
 import TagIcon from '@mui/icons-material/Tag';
+import SandBoxIcon from "@mui/icons-material/AllInclusive";
 import AnotsysLogo from "../assets/anotsys.png";
 
 const drawerWidth = 250;
@@ -59,6 +60,11 @@ const allSidebarItems: SidebarCategory[] = [
         text: "Regex Visualizer",
         path: "/regex-visualizer",
         icon: <VisibilityIcon />,
+      },
+      {
+        text: "Regex Sandbox",
+        path: "/regex-sandbox",
+        icon: <SandBoxIcon />,
       },
     ],
   },
@@ -188,95 +194,130 @@ export function Sidebar() {
           boxSizing: "border-box",
           backgroundColor: "#1e1e1e",
           color: "#fff",
-          overflowY: 'auto'
         },
       }}
     >
-      <Box
-        sx={{
-          p: 2,
-          textAlign: "center",
-          borderBottom: "1px solid #444",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: 1,
-        }}
-      >
-        <img
-          src={AnotsysLogo}
-          alt="Anotsys Logo"
-          style={{ width: 30, height: 30 }}
-        />
-        <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
-          Anotsys
-        </Typography>
-      </Box>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        <Box
+          sx={{
+            p: 2,
+            textAlign: "center",
+            borderBottom: "1px solid #444",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 1,
+            position: 'sticky',
+            top: 0,
+            backgroundColor: '#1e1e1e',
+            zIndex: 100,
+          }}
+        >
+          <img
+            src={AnotsysLogo}
+            alt="Anotsys Logo"
+            style={{ width: 30, height: 30 }}
+          />
+          <Typography variant="h6" sx={{ fontWeight: "bold", color: "#fff" }}>
+            Anotsys
+          </Typography>
+        </Box>
 
-      <Box sx={{ p: 2, borderBottom: '1px solid #444' }}>
-        <TextField
-          fullWidth
-          variant="outlined"
-          placeholder="Search..."
-          size="small"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          InputProps={{
-            startAdornment: (
-              <InputAdornment position="start">
-                <SearchIcon sx={{ color: '#fff' }} />
-              </InputAdornment>
-            ),
-            sx: {
-              color: '#fff',
-              '& .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#444',
+        <Box
+          sx={{
+            p: 2,
+            borderBottom: '1px solid #444',
+            position: 'sticky',
+            top: '56px',
+            backgroundColor: '#1e1e1e',
+            zIndex: 100,
+          }}
+        >
+          <TextField
+            fullWidth
+            variant="outlined"
+            placeholder="Search..."
+            size="small"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon sx={{ color: '#fff' }} />
+                </InputAdornment>
+              ),
+              sx: {
+                color: '#fff',
+                '& .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#444',
+                },
+                '&:hover .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#666',
+                },
+                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                  borderColor: '#00bcd4',
+                },
               },
-              '&:hover .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#666',
-              },
-              '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                borderColor: '#00bcd4',
+            }}
+          />
+        </Box>
+        
+        <List 
+          sx={{ 
+            flexGrow: 1, 
+            paddingY: 0, 
+            overflowY: 'auto',
+            // Scrollbar styles for the List component
+            "&::-webkit-scrollbar": {
+              width: "12px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#2d2d2d",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#555",
+              borderRadius: "10px",
+              border: "3px solid #1e1e1e",
+              "&:hover": {
+                backgroundColor: "#888",
               },
             },
           }}
-        />
+        >
+          {filteredSidebarItems.length > 0 ? (
+            filteredSidebarItems.map((category) => (
+              <React.Fragment key={category.title}>
+                <ListItem sx={{ padding: '16px 8px 8px 8px' }}>
+                  <Typography variant="overline" sx={{ color: '#888', fontWeight: 'bold' }}>
+                    {category.title}
+                  </Typography>
+                </ListItem>
+                {category.items.map((item, index) => (
+                  <Box
+                    key={item.text}
+                    sx={{
+                      animation: searchQuery ? `stack-up 0.6s ease-in-out forwards ${index * 0.1}s` : 'none',
+                      '@keyframes stack-up': {
+                        from: { opacity: 0, transform: 'translateY(20px)' },
+                        to: { opacity: 1, transform: 'translateY(0)' },
+                      },
+                      paddingBottom: '2px',
+                    }}
+                  >
+                    {renderSidebarItem(item)}
+                  </Box>
+                ))}
+              </React.Fragment>
+            ))
+          ) : (
+            <ListItem>
+              <Typography variant="body2" sx={{ color: '#888', textAlign: 'center', width: '100%', mt: 2 }}>
+                Sonuç bulunamadı.
+              </Typography>
+            </ListItem>
+          )}
+        </List>
       </Box>
-
-      <List>
-        {filteredSidebarItems.length > 0 ? (
-          filteredSidebarItems.map((category) => (
-            <React.Fragment key={category.title}>
-              <ListItem sx={{ padding: '16px 8px 8px 8px' }}>
-                <Typography variant="overline" sx={{ color: '#888', fontWeight: 'bold' }}>
-                  {category.title}
-                </Typography>
-              </ListItem>
-              {category.items.map((item, index) => (
-                <Box
-                  key={item.text}
-                  sx={{
-                    animation: searchQuery ? `stack-up 0.6s ease-in-out forwards ${index * 0.1}s` : 'none',
-                    '@keyframes stack-up': {
-                      from: { opacity: 0, transform: 'translateY(20px)' },
-                      to: { opacity: 1, transform: 'translateY(0)' },
-                    },
-                    paddingBottom: '2px',
-                  }}
-                >
-                  {renderSidebarItem(item)}
-                </Box>
-              ))}
-            </React.Fragment>
-          ))
-        ) : (
-          <ListItem>
-            <Typography variant="body2" sx={{ color: '#888', textAlign: 'center', width: '100%', mt: 2 }}>
-              Sonuç bulunamadı.
-            </Typography>
-          </ListItem>
-        )}
-      </List>
     </Drawer>
   );
 }
