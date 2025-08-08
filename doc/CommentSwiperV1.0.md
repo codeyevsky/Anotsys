@@ -64,5 +64,4 @@ Using the app is quite simple:
 3.  **Clean:** Click the "Clean Comments" button to start removing the comments.
 4.  **Get the Result:** The cleaned code will appear in the "Result" area. You can copy it using the "Copy" button.
 
->>>>>>> 980dad914b7bc229d04b0934c8f9d29be43ae96e
 ---
