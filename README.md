@@ -28,8 +28,6 @@
   Interactive tool to test, debug, and refine regular expressions with real-time feedback.
 - **Regex Visualizer**  
   Graphically represents regex structures, aiding comprehension and debugging.
-- **Formatter**  
-  Beautifies and formats structured data formats such as JSON, XML, and HTML for readability and consistency.
 - **Code Complexity Heatmap**  
   Visual analysis of code complexity, highlighting areas that may need refactoring or optimization.
 

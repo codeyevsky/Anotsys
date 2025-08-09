@@ -5,7 +5,6 @@ import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { MainLayout } from './components/MainLayout';
 import { AiNotificationSystemPage } from './pages/AiNotificationSystemPage';
 import { NpmSchedulePage } from './pages/NpmSchedulePage';
-import { FormatterPage } from './pages/FormatterPage';
 import { CommentSwiperPage } from './pages/CommentSwiperPage';
 import { RegexLibraryPage } from './pages/RegexLibraryPage';
 import { RegexDebuggerPage } from './pages/RegexDebuggerPage';
@@ -72,7 +71,6 @@ function App() {
           <Route index element={<WelcomePage />} />
           <Route path="ai-notification-system" element={<AiNotificationSystemPage />} />
           <Route path="npm-schedule" element={<NpmSchedulePage />} />
-          <Route path="formatter" element={<FormatterPage />} />
           <Route path="comment-swiper" element={<CommentSwiperPage />} />
           <Route path="regex-library" element={<RegexLibraryPage />} />
           <Route path="regex-debugger" element={<RegexDebuggerPage />} />

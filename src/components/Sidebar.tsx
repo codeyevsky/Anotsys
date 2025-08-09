@@ -3,7 +3,6 @@ import { Link, useLocation } from "react-router-dom";
 import { Drawer, List, ListItem, ListItemButton, ListItemIcon, ListItemText, Box, Typography, TextField, InputAdornment } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import HubIcon from "@mui/icons-material/Hub";
-import FormatAlignLeftIcon from "@mui/icons-material/FormatAlignLeft";
 import ChecklistIcon from "@mui/icons-material/Checklist";
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks";
 import BugReportIcon from "@mui/icons-material/BugReport";
@@ -72,7 +71,6 @@ const allSidebarItems: SidebarCategory[] = [
     title: "DEVELOPER TOOLS",
     items: [
       { text: "NPM Schedule", path: "/npm-schedule", icon: <EventNoteIcon /> },
-      { text: "Formatter", path: "/formatter", icon: <FormatAlignLeftIcon /> },
       { text: "To-Do", path: "/todo", icon: <ChecklistIcon /> },
       { text: "Pomodoro", path: "/pomodoro", icon: <TimerIcon /> },
     ],
