@@ -1,38 +1,38 @@
 # 🚀 Pomodoro Timer V1.0
 
-Pomodoro Timer, odaklanmanı ve verimliliğini artırmana yardımcı olan, minimalist ve şık bir zamanlayıcıdır.  
-Sezgisel kullanıcı arayüzü sayesinde çalışma ve mola sürelerini kolayca yönetebilir, böylece iş akışını en üst düzeye çıkarabilirsin.
+Pomodoro Timer is a minimalist and stylish timer designed to help you boost focus and productivity.  
+With its intuitive user interface, you can easily manage your work and break times, maximizing your workflow.
 
 ---
 
-## ✨ Özellikler
+## ✨ Features
 
-- **Çalışma ve Mola Modları**  
-  Çalışma, kısa mola ve uzun mola arasında geçiş yapmanı sağlayan üç farklı mod bulunur.
+- **Work and Break Modes**  
+  Includes three different modes: Work, Short Break, and Long Break, allowing you to switch seamlessly between them.
 
-- **Dinamik Kullanıcı Arayüzü (UI)**  
-  Seçtiğin moda göre uygulamanın renkleri dinamik olarak değişir. Bu, hangi zaman diliminde olduğunu görsel olarak takip etmeni kolaylaştırır.
+- **Dynamic User Interface (UI)**  
+  The app’s colors change dynamically depending on the mode you choose, making it easier to visually track your current session.
 
-- **Minimalist ve Şık Tasarım**  
-  Modern ve sade tasarımı sayesinde göz yormaz ve dikkatini dağıtmaz.
+- **Minimalist and Stylish Design**  
+  With its modern and clean design, it won’t strain your eyes or distract your attention.
 
-- **Anında Geri Bildirim**  
-  Her mod süresinin sonunda bir bildirim alarak bir sonraki adıma hazır olursun.
+- **Instant Feedback**  
+  Receive a notification at the end of each mode’s duration so you’re ready for the next step.
 
 ---
 
-## 🛠️ Nasıl Kullanılır
+## 🛠️ How to Use
 
-1. **Modu Seç**  
-   Çalışma (Çalışma), kısa mola (Kısa Mola) veya uzun mola (Uzun Mola) modlarından birini seç.
+1. **Select a Mode**  
+   Choose between Work, Short Break, or Long Break.
 
-2. **Başlat**  
-   Zamanlayıcıyı başlatmak için **"Başlat"** butonuna tıkla.
+2. **Start**  
+   Click the **"Start"** button to begin the timer.
 
-3. **Duraklat / Sıfırla**  
-   İhtiyacın olursa zamanlayıcıyı duraklatabilir veya **"Sıfırla"** butonuyla başlangıç durumuna döndürebilirsin.
+3. **Pause / Reset**  
+   You can pause the timer at any time or return it to its initial state with the **"Reset"** button.
 
-4. **Sonuçları Gözlemle**  
-   Süre dolduğunda alacağın bildirimle yeni moda geçmeye hazır olursun.
+4. **Observe the Results**  
+   When the time is up, you’ll receive a notification letting you know it’s time to switch to the next mode.
 
 ---

@@ -1,23 +1,30 @@
 import { useState, useEffect } from "react";
-import { Box, Typography, Button, Stack } from "@mui/material";
+import { Box, Typography, Button, Stack, Container, useTheme, Alert } from "@mui/material";
+import { motion } from "framer-motion";
 
-const WORK_TIME = 25 * 60; // 25 dakika
-const SHORT_BREAK = 5 * 60; // 5 dakika
-const LONG_BREAK = 15 * 60; // 15 dakika
+// Süre sabitleri
+const WORK_TIME = 25 * 60;
+const SHORT_BREAK = 5 * 60;
+const LONG_BREAK = 15 * 60;
+
+const bellSound = typeof window !== 'undefined' ? new Audio('/bell.mp3') : undefined;
 
 export function PomodoroPage() {
+  const theme = useTheme();
   const [timeLeft, setTimeLeft] = useState(WORK_TIME);
   const [isRunning, setIsRunning] = useState(false);
-  const [mode, setMode] = useState<'work' | 'short-break' | 'long-break'>("work"); // Hata burada düzeltildi
+  const [mode, setMode] = useState<'work' | 'short-break' | 'long-break'>("work");
+  const [completedWorkSessions, setCompletedWorkSessions] = useState(0);
+  const [showNotification, setShowNotification] = useState(false);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
+    let interval: NodeJS.Timeout | undefined;
     if (isRunning && timeLeft > 0) {
       interval = setInterval(() => {
         setTimeLeft((prevTime) => prevTime - 1);
       }, 1000);
-    } else if (timeLeft === 0) {
-      clearInterval(interval!);
+    } else if (timeLeft === 0 && isRunning) {
+      if (interval) clearInterval(interval);
       handleTimerEnd();
     }
     return () => {
@@ -33,6 +40,7 @@ export function PomodoroPage() {
     setIsRunning(false);
     setMode("work");
     setTimeLeft(WORK_TIME);
+    setCompletedWorkSessions(0);
   };
 
   const handleModeChange = (newMode: 'work' | 'short-break' | 'long-break') => {
@@ -54,43 +62,64 @@ export function PomodoroPage() {
   };
 
   const handleTimerEnd = () => {
-    // Burada bir bildirim veya ses çalabiliriz
-    alert(`${mode === "work" ? "Çalışma" : "Mola"} süresi bitti!`);
+    if (bellSound) {
+        bellSound.play();
+    }
+    setShowNotification(true);
 
-    // Otomatik olarak bir sonraki moda geçiş yap
     if (mode === "work") {
-      handleModeChange("short-break");
+      setCompletedWorkSessions(prev => prev + 1);
+      if ((completedWorkSessions + 1) % 4 === 0) {
+        handleModeChange("long-break");
+      } else {
+        handleModeChange("short-break");
+      }
     } else {
       handleModeChange("work");
     }
+
+    setTimeout(() => {
+      setShowNotification(false);
+    }, 3000);
   };
 
   const minutes = Math.floor(timeLeft / 60);
   const seconds = timeLeft % 60;
-  const timeDisplay = `${minutes < 10 ? "0" : ""}${minutes}:${
-    seconds < 10 ? "0" : ""
-  }${seconds}`;
+  const timeDisplay = `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
 
   const getColorByMode = (selectedMode: 'work' | 'short-break' | 'long-break') => {
     switch (selectedMode) {
       case "work":
-        return "#ff6b6b";
+        return "#D32F2F";
       case "short-break":
-        return "#59c3c3";
+        return "#1976D2";
       case "long-break":
-        return "#f7d794";
+        return "#FBC02D";
       default:
-        return "#e0e0e0";
+        return theme.palette.grey[500];
     }
   };
 
   const modeColor = getColorByMode(mode);
 
+  const getModeTitle = () => {
+    switch (mode) {
+      case "work":
+        return "Çalışma Zamanı";
+      case "short-break":
+        return "Kısa Mola";
+      case "long-break":
+        return "Uzun Mola";
+      default:
+        return "Pomodoro";
+    }
+  };
+
   return (
     <Box
       sx={{
-        backgroundColor: "#1c1c1c",
-        color: "#e0e0e0",
+        backgroundColor: "#121212",
+        color: "#ffffff",
         minHeight: "100vh",
         display: "flex",
         flexDirection: "column",
@@ -98,6 +127,7 @@ export function PomodoroPage() {
         fontFamily: "Roboto, sans-serif",
       }}
     >
+      {/* Header */}
       <Box
         sx={{
           p: 3,
@@ -113,155 +143,188 @@ export function PomodoroPage() {
           color="#00bcd4"
           sx={{ lineHeight: "0.47", fontWeight: "bold" }}
         >
-          Pomodoro
+          Pomodoro Zamanlayıcı
         </Typography>
       </Box>
 
-      <Box
-        sx={{
-          width: "90%",
-          maxWidth: "500px",
-          backgroundColor: "rgba(30, 30, 30, 0.7)",
-          backdropFilter: "blur(10px)",
-          borderRadius: "32px",
-          p: 6,
-          mt: 8,
-          mb: 4,
-          position: "relative",
-          textAlign: "center",
-          border: `2px solid ${modeColor}`,
-          boxShadow: `0 0 40px ${modeColor}50`,
-          transition: "all 0.5s ease-in-out",
-        }}
-      >
+      {/* Main Content (Timer, Buttons, etc.) */}
+      <Container maxWidth="sm" sx={{ p: 4, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        {/* Zamanlayıcı Kutusu */}
+        <Box
+          sx={{
+            backgroundColor: "rgba(25, 25, 25, 0.9)",
+            borderRadius: "24px",
+            p: 4,
+            textAlign: "center",
+            border: `3px solid ${modeColor}`,
+            transition: "all 0.5s ease-in-out",
+            boxShadow: `0 0 30px ${modeColor}50`,
+          }}
+        >
+          {/* Mod Başlığı */}
+          <Typography
+            variant="h5"
+            sx={{
+              fontWeight: "bold",
+              color: modeColor,
+              mb: 3,
+              transition: "color 0.5s ease",
+            }}
+          >
+            {getModeTitle()}
+          </Typography>
+
+          {/* Zaman Göstergesi */}
+          <motion.div
+            key={mode}
+            initial={{ scale: 0.8, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          >
+            <Typography
+              variant="h1"
+              sx={{
+                fontSize: { xs: "5rem", md: "7rem" },
+                fontWeight: 300,
+                color: modeColor,
+                letterSpacing: "4px",
+                mb: 4,
+                fontFamily: "monospace",
+                textShadow: `0 0 15px ${modeColor}aa`,
+                transition: "color 0.5s ease",
+              }}
+            >
+              {timeDisplay}
+            </Typography>
+          </motion.div>
+
+          {/* Kontrol Düğmeleri */}
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="center"
+            sx={{ mb: 3 }}
+          >
+            <Button
+              variant="contained"
+              onClick={handleStartPause}
+              sx={{
+                backgroundColor: modeColor,
+                "&:hover": { backgroundColor: modeColor, boxShadow: `0 0 20px ${modeColor}aa` },
+                color: theme.palette.getContrastText(modeColor),
+                fontWeight: "bold",
+                fontSize: "1rem",
+                padding: "10px 24px",
+                borderRadius: "20px",
+                textTransform: "none",
+                minWidth: "140px",
+              }}
+            >
+              {isRunning ? "Duraklat" : "Başlat"}
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={handleReset}
+              disabled={!isRunning && timeLeft === WORK_TIME && completedWorkSessions === 0}
+              sx={{
+                borderColor: modeColor,
+                color: modeColor,
+                "&:hover": { borderColor: modeColor, backgroundColor: `${modeColor}1a` },
+                fontWeight: "bold",
+                fontSize: "1rem",
+                padding: "10px 24px",
+                borderRadius: "20px",
+                textTransform: "none",
+                minWidth: "140px",
+              }}
+            >
+              Sıfırla
+            </Button>
+          </Stack>
+        </Box>
+
+        {/* Mod Seçim Düğmeleri */}
         <Stack
           direction="row"
           spacing={2}
           justifyContent="center"
-          sx={{ mb: 4 }}
+          sx={{ mt: 4 }}
         >
           <Button
+            variant={mode === "work" ? "contained" : "outlined"}
             onClick={() => handleModeChange("work")}
             sx={{
-              color: "#e0e0e0",
-              backgroundColor: mode === "work" ? modeColor : "transparent",
-              "&:hover": {
-                backgroundColor: mode === "work" ? modeColor : "rgba(255, 255, 255, 0.1)",
-                color: mode === "work" ? "#000" : modeColor,
-              },
-              borderRadius: "16px",
-              fontWeight: "bold",
-              textTransform: "none",
-              minWidth: "120px",
-              transition: "all 0.3s ease",
+              ...modeButtonStyle,
+              backgroundColor: mode === "work" ? getColorByMode("work") : "transparent",
+              color: mode === "work" ? "#000" : getColorByMode("work"),
+              borderColor: getColorByMode("work"),
             }}
           >
-            Çalışma
+            Çalış
           </Button>
           <Button
+            variant={mode === "short-break" ? "contained" : "outlined"}
             onClick={() => handleModeChange("short-break")}
             sx={{
-              color: "#e0e0e0",
-              backgroundColor: mode === "short-break" ? modeColor : "transparent",
-              "&:hover": {
-                backgroundColor: mode === "short-break" ? modeColor : "rgba(255, 255, 255, 0.1)",
-                color: mode === "short-break" ? "#000" : modeColor,
-              },
-              borderRadius: "16px",
-              fontWeight: "bold",
-              textTransform: "none",
-              minWidth: "120px",
-              transition: "all 0.3s ease",
+              ...modeButtonStyle,
+              backgroundColor: mode === "short-break" ? getColorByMode("short-break") : "transparent",
+              color: mode === "short-break" ? "#000" : getColorByMode("short-break"),
+              borderColor: getColorByMode("short-break"),
             }}
           >
             Kısa Mola
           </Button>
           <Button
+            variant={mode === "long-break" ? "contained" : "outlined"}
             onClick={() => handleModeChange("long-break")}
             sx={{
-              color: "#e0e0e0",
-              backgroundColor: mode === "long-break" ? modeColor : "transparent",
-              "&:hover": {
-                backgroundColor: mode === "long-break" ? modeColor : "rgba(255, 255, 255, 0.1)",
-                color: mode === "long-break" ? "#000" : modeColor,
-              },
-              borderRadius: "16px",
-              fontWeight: "bold",
-              textTransform: "none",
-              minWidth: "120px",
-              transition: "all 0.3s ease",
+              ...modeButtonStyle,
+              backgroundColor: mode === "long-break" ? getColorByMode("long-break") : "transparent",
+              color: mode === "long-break" ? "#000" : getColorByMode("long-break"),
+              borderColor: getColorByMode("long-break"),
             }}
           >
             Uzun Mola
           </Button>
         </Stack>
 
-        <Typography
-          variant="h1"
-          sx={{
-            fontSize: { xs: "5.5rem", md: "8rem" },
-            fontWeight: 300,
-            color: modeColor,
-            letterSpacing: "8px",
-            mb: 4,
-            fontFamily: "monospace",
-            transition: "color 0.5s ease",
-            textShadow: `0 0 10px ${modeColor}aa`,
-          }}
-        >
-          {timeDisplay}
-        </Typography>
+        {/* Tamamlanan oturumları gösteren bilgi */}
+        <Box textAlign="center" mt={4}>
+          <Typography variant="body1" sx={{ color: "#9e9e9e" }}>
+            Tamamlanan Oturumlar:{" "}
+            <Typography component="span" fontWeight="bold" color={getColorByMode("work")}>
+              {completedWorkSessions}
+            </Typography>
+          </Typography>
+        </Box>
 
-        <Stack
-          direction={{ xs: "column", sm: "row" }}
-          spacing={2}
-          justifyContent="center"
-        >
-          <Button
-            variant="contained"
-            onClick={handleStartPause}
+        {/* Zamanlayıcı bittiğinde gösterilecek bildirim */}
+        {showNotification && (
+          <Alert
+            severity="info"
             sx={{
-              backgroundColor: modeColor,
-              "&:hover": {
-                backgroundColor: modeColor,
-                boxShadow: `0 0 15px ${modeColor}aa`,
-              },
-              color: "#000",
-              fontWeight: "bold",
-              fontSize: "1.2rem",
-              padding: "12px 24px",
-              borderRadius: "16px",
-              textTransform: "none",
-              minWidth: "150px",
-              transition: "all 0.3s ease",
+              position: 'fixed',
+              bottom: 20,
+              left: '50%',
+              transform: 'translateX(-50%)',
+              width: '90%',
+              maxWidth: 400,
+              borderRadius: 2,
+              boxShadow: 3
             }}
           >
-            {isRunning ? "Duraklat" : "Başlat"}
-          </Button>
-          <Button
-            variant="outlined"
-            onClick={handleReset}
-            disabled={!isRunning && timeLeft === WORK_TIME}
-            sx={{
-              borderColor: modeColor,
-              color: modeColor,
-              "&:hover": {
-                borderColor: modeColor,
-                backgroundColor: "rgba(255, 255, 255, 0.1)",
-                boxShadow: `0 0 15px ${modeColor}aa`,
-              },
-              fontWeight: "bold",
-              fontSize: "1.2rem",
-              padding: "12px 24px",
-              borderRadius: "16px",
-              textTransform: "none",
-              minWidth: "150px",
-            }}
-          >
-            Sıfırla
-          </Button>
-        </Stack>
-      </Box>
+            {mode === "work" ? "Mola zamanı başladı!" : "Çalışma zamanı başladı!"}
+          </Alert>
+        )}
+      </Container>
     </Box>
   );
 }
+
+const modeButtonStyle = {
+  textTransform: "none",
+  fontWeight: "bold",
+  borderRadius: "16px",
+  padding: "8px 16px",
+  transition: "all 0.3s ease",
+};
