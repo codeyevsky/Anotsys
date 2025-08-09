@@ -17,7 +17,7 @@ Sezgisel kullanıcı arayüzü sayesinde çalışma ve mola sürelerini kolayca 
   Modern ve sade tasarımı sayesinde göz yormaz ve dikkatini dağıtmaz.
 
 - **Anında Geri Bildirim**  
-  Her mod süresinin sonunda bir bildirim alarak bir sonraki adıma hazır olursun.
+  Her mod süresinin sonunda bir bildirim alarak bir sonraki adıma hazır olursun
 
 ---
 
