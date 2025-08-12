@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Box, Typography, Button, Stack, Container, useTheme, Alert } from "@mui/material";
 import { motion } from "framer-motion";
 
-// Süre sabitleri
+// Time constants
 const WORK_TIME = 25 * 60;
 const SHORT_BREAK = 5 * 60;
 const LONG_BREAK = 15 * 60;
@@ -63,7 +63,7 @@ export function PomodoroPage() {
 
   const handleTimerEnd = () => {
     if (bellSound) {
-        bellSound.play();
+      bellSound.play();
     }
     setShowNotification(true);
 
@@ -105,11 +105,11 @@ export function PomodoroPage() {
   const getModeTitle = () => {
     switch (mode) {
       case "work":
-        return "Çalışma Zamanı";
+        return "Work Time";
       case "short-break":
-        return "Kısa Mola";
+        return "Short Break";
       case "long-break":
-        return "Uzun Mola";
+        return "Long Break";
       default:
         return "Pomodoro";
     }
@@ -143,13 +143,13 @@ export function PomodoroPage() {
           color="#00bcd4"
           sx={{ lineHeight: "0.47", fontWeight: "bold" }}
         >
-          Pomodoro Zamanlayıcı
+          Pomodoro Timer
         </Typography>
       </Box>
 
       {/* Main Content (Timer, Buttons, etc.) */}
       <Container maxWidth="sm" sx={{ p: 4, flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        {/* Zamanlayıcı Kutusu */}
+        {/* Timer Box */}
         <Box
           sx={{
             backgroundColor: "rgba(25, 25, 25, 0.9)",
@@ -161,7 +161,7 @@ export function PomodoroPage() {
             boxShadow: `0 0 30px ${modeColor}50`,
           }}
         >
-          {/* Mod Başlığı */}
+          {/* Mode Title */}
           <Typography
             variant="h5"
             sx={{
@@ -174,7 +174,7 @@ export function PomodoroPage() {
             {getModeTitle()}
           </Typography>
 
-          {/* Zaman Göstergesi */}
+          {/* Time Display */}
           <motion.div
             key={mode}
             initial={{ scale: 0.8, opacity: 0 }}
@@ -198,7 +198,7 @@ export function PomodoroPage() {
             </Typography>
           </motion.div>
 
-          {/* Kontrol Düğmeleri */}
+          {/* Control Buttons */}
           <Stack
             direction="row"
             spacing={2}
@@ -220,7 +220,7 @@ export function PomodoroPage() {
                 minWidth: "140px",
               }}
             >
-              {isRunning ? "Duraklat" : "Başlat"}
+              {isRunning ? "Pause" : "Start"}
             </Button>
             <Button
               variant="outlined"
@@ -238,12 +238,12 @@ export function PomodoroPage() {
                 minWidth: "140px",
               }}
             >
-              Sıfırla
+              Reset
             </Button>
           </Stack>
         </Box>
 
-        {/* Mod Seçim Düğmeleri */}
+        {/* Mode Selection Buttons */}
         <Stack
           direction="row"
           spacing={2}
@@ -260,7 +260,7 @@ export function PomodoroPage() {
               borderColor: getColorByMode("work"),
             }}
           >
-            Çalış
+            Work
           </Button>
           <Button
             variant={mode === "short-break" ? "contained" : "outlined"}
@@ -272,7 +272,7 @@ export function PomodoroPage() {
               borderColor: getColorByMode("short-break"),
             }}
           >
-            Kısa Mola
+            Short Break
           </Button>
           <Button
             variant={mode === "long-break" ? "contained" : "outlined"}
@@ -284,21 +284,21 @@ export function PomodoroPage() {
               borderColor: getColorByMode("long-break"),
             }}
           >
-            Uzun Mola
+            Long Break
           </Button>
         </Stack>
 
-        {/* Tamamlanan oturumları gösteren bilgi */}
+        {/* Info showing completed sessions */}
         <Box textAlign="center" mt={4}>
           <Typography variant="body1" sx={{ color: "#9e9e9e" }}>
-            Tamamlanan Oturumlar:{" "}
+            Completed Sessions:{" "}
             <Typography component="span" fontWeight="bold" color={getColorByMode("work")}>
               {completedWorkSessions}
             </Typography>
           </Typography>
         </Box>
 
-        {/* Zamanlayıcı bittiğinde gösterilecek bildirim */}
+        {/* Notification to show when the timer ends */}
         {showNotification && (
           <Alert
             severity="info"
@@ -313,7 +313,7 @@ export function PomodoroPage() {
               boxShadow: 3
             }}
           >
-            {mode === "work" ? "Mola zamanı başladı!" : "Çalışma zamanı başladı!"}
+            {mode === "work" ? "Break time has started!" : "Work time has started!"}
           </Alert>
         )}
       </Container>
