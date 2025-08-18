@@ -3,7 +3,6 @@ import { Sidebar } from "./Sidebar";
 import { Box, CssBaseline } from "@mui/material";
 
 export function MainLayout() {
-  const drawerWidth = 200;
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
@@ -14,7 +13,6 @@ export function MainLayout() {
         sx={{
           flexGrow: 1,
           p: 0,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
           backgroundColor: '#222',
           overflowY: 'auto',
           "&::-webkit-scrollbar": {
@@ -36,6 +34,14 @@ export function MainLayout() {
       >
         <Outlet />
       </Box>
+      <Box
+        sx={{
+          position: 'fixed',
+          height: '100%',
+          backgroundColor: 'black', // Boşluğu siyaha boya
+          zIndex: -1, // Diğer içeriklerin arkasında kalmasını sağla
+        }}
+      />
     </Box>
   );
 }

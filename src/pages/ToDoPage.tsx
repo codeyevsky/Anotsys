@@ -12,18 +12,17 @@ import {
   InputLabel,
   FormControl,
   Popover,
+  Modal,
+  Fade,
 } from "@mui/material";
 import MoreHorizIcon from '@mui/icons-material/MoreHoriz';
 import CloseIcon from "@mui/icons-material/Close";
-
-// DEĞİŞİKLİK BURADA: Yeni ikonları içe aktarıyoruz
+import AddIcon from '@mui/icons-material/Add';
 import KeyboardDoubleArrowDownIcon from '@mui/icons-material/KeyboardDoubleArrowDown';
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import KeyboardDoubleArrowUpIcon from '@mui/icons-material/KeyboardDoubleArrowUp';
-
 import { nanoid } from "nanoid";
 
-// Her bir görevin türünü tanımlıyoruz
 type Priority = "low" | "medium" | "high";
 
 interface Task {
@@ -33,7 +32,6 @@ interface Task {
   comment?: string;
 }
 
-// Her bir sütunun türünü tanımlıyoruz
 interface Column {
   id: "todo" | "inprogress" | "done" | "cancelled";
   title: string;
@@ -52,7 +50,6 @@ const PriorityIndicator = styled(Box)<{ priority: Priority }>(({ priority }) => 
       : "#4caf50",
 }));
 
-// DEĞİŞİKLİK BURADA: PriorityLabel bileşenini güncelliyoruz
 const PriorityLabel = styled(Box)<{ priority: Priority }>(({ priority }) => ({
   display: 'flex',
   alignItems: 'center',
@@ -60,18 +57,20 @@ const PriorityLabel = styled(Box)<{ priority: Priority }>(({ priority }) => ({
   borderRadius: '4px',
   fontSize: '0.75rem',
   fontWeight: 'bold',
-  color: '#ffffff', // Tüm yazılar beyaz olacak
+  color: '#ffffff',
   backgroundColor:
     priority === "high"
-      ? "#f44336" // Kırmızı arka plan
+      ? "#f44336"
       : priority === "medium"
-      ? "#ff9800" // Sarı arka plan
-      : "#4caf50", // Yeşil arka plan
+      ? "#ff9800"
+      : "#4caf50",
   "& .MuiSvgIcon-root": {
     fontSize: '0.85rem',
     marginRight: '4px',
-    color: '#ffffff', // Tüm ikonlar beyaz olacak
-  }
+    color: '#ffffff',
+  },
+  width: '80px',
+  justifyContent: 'flex-start',
 }));
 
 const ToDoPageWrapper = styled(Box)({
@@ -81,6 +80,17 @@ const ToDoPageWrapper = styled(Box)({
   fontFamily: "'Roboto', sans-serif",
   display: "flex",
   flexDirection: "column",
+  "&::-webkit-scrollbar": {
+    width: "12px",
+  },
+  "&::-webkit-scrollbar-track": {
+    backgroundColor: "#121212",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#444",
+    borderRadius: "10px",
+    border: "3px solid #121212",
+  },
 });
 
 const ColumnsContainer = styled(Box)({
@@ -95,6 +105,17 @@ const ColumnsContainer = styled(Box)({
     flexDirection: "column",
     alignItems: "center",
   },
+  "&::-webkit-scrollbar": {
+    height: "12px",
+  },
+  "&::-webkit-scrollbar-track": {
+    backgroundColor: "#1e1e1e",
+  },
+  "&::-webkit-scrollbar-thumb": {
+    backgroundColor: "#444",
+    borderRadius: "10px",
+    border: "3px solid #1e1e1e",
+  },
 });
 
 const ColumnBox = styled(Box)({
@@ -103,19 +124,13 @@ const ColumnBox = styled(Box)({
   borderRadius: "12px",
   boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
   minWidth: "280px",
+  maxWidth: "280px",
   flexShrink: 0,
   minHeight: "500px",
   display: "flex",
   flexDirection: "column",
   "@media (max-width: 600px)": {
     width: "90%",
-  },
-  "& h2": {
-    textAlign: "center",
-    borderBottom: "2px solid #333",
-    paddingBottom: "12px",
-    marginBottom: "16px",
-    color: "#00bcd4",
   },
 });
 
@@ -126,42 +141,73 @@ const TaskItem = styled(Box)({
   marginBottom: "12px",
   transition: "box-shadow 0.2s ease-in-out",
   display: "flex",
-  alignItems: "center",
+  alignItems: "flex-start",
   justifyContent: 'space-between',
   cursor: "pointer",
+  position: 'relative',
+  paddingRight: '40px',
   "&:hover": {
     boxShadow: "0 2px 8px rgba(0,0,0,0.3)",
   },
+  maxHeight: '100px',
+  overflow: 'hidden',
+  width: '100%',
 });
+
+const MoreIconWrapper = styled(Box)({
+    position: 'absolute',
+    top: '8px',
+    right: '8px',
+    zIndex: 2,
+    color: '#e0e0e0',
+});
+
+const getPriorityValue = (priority: Priority) => {
+  switch (priority) {
+    case "high":
+      return 3;
+    case "medium":
+      return 2;
+    case "low":
+      return 1;
+    default:
+      return 0;
+  }
+};
+
+const sortTasksByPriority = (tasks: Task[]) => {
+  return [...tasks].sort((a, b) => getPriorityValue(b.priority) - getPriorityValue(a.priority));
+};
 
 export function ToDoPage() {
   const [columns, setColumns] = useState<Column[]>([
     {
       id: "todo",
-      title: "Yapılacaklar",
-      tasks: [
-        { id: nanoid(), content: "İlk görev", priority: "high" },
-        { id: nanoid(), content: "İkinci görev", priority: "medium" },
-      ],
+      title: "To Do",
+      tasks: sortTasksByPriority([
+        { id: nanoid(), content: "This is a very very long task content that should be truncated", priority: "high" },
+        { id: nanoid(), content: "This is the second task", priority: "medium" },
+      ]),
     },
     {
       id: "inprogress",
-      title: "Yapılıyor",
+      title: "In Progress",
       tasks: [],
     },
     {
       id: "done",
-      title: "Yapıldı",
+      title: "Done",
       tasks: [],
     },
     {
       id: "cancelled",
-      title: "İptal Edildi",
+      title: "Cancelled",
       tasks: [],
     },
   ]);
 
   const [newTaskContent, setNewTaskContent] = useState("");
+  const [newTaskPriority, setNewTaskPriority] = useState<Priority>("medium");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [selectedTaskColumnId, setSelectedTaskColumnId] = useState<
@@ -169,6 +215,92 @@ export function ToDoPage() {
   >(null);
 
   const [popoverAnchorEl, setPopoverAnchorEl] = useState<null | HTMLElement>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedColumnForNewTask, setSelectedColumnForNewTask] = useState<string>('todo');
+
+  const [codeContent, setCodeContent] = useState("");
+  const [parsedTasks, setParsedTasks] = useState<{ content: string; code: string; }[]>([]);
+
+  // Koddan TODO yorumlarını ve ilgili kod bloklarını ayıklayan fonksiyon
+  const handleParseCode = (code: string) => {
+    const lines = code.split('\n');
+    const tasks = [];
+    let currentCodeBlock = '';
+
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i];
+      const todoMatch = line.match(/(\/\/|#|\/\*|\*|\s?\*)\s*(Todo|To-do|To-do:|Todo:)(.*)/i);
+      
+      if (todoMatch) {
+        const todoContent = todoMatch[3].trim();
+        
+        // Önceki satırlardan başlayarak ilgili kod bloğunu bulma
+        let codeBlock = '';
+        let braceCount = 0;
+        let startLine = i - 1;
+        let isCodeFound = false;
+        
+        // TODO satırından başlayarak parantezleri kontrol et
+        for (let j = i; j < lines.length; j++) {
+            const currentLine = lines[j];
+            codeBlock += currentLine + '\n';
+            if (currentLine.includes('{')) {
+                braceCount++;
+                isCodeFound = true;
+            }
+            if (currentLine.includes('}')) {
+                braceCount--;
+            }
+            if (isCodeFound && braceCount === 0) {
+                break;
+            }
+        }
+
+        // Eğer {} bloğu bulunamazsa, sadece TODO satırını veya önceki birkaç satırı al
+        if (!isCodeFound) {
+            codeBlock = '';
+            let k = i;
+            while (k >= 0 && lines[k].trim() !== '') {
+                codeBlock = lines[k] + '\n' + codeBlock;
+                k--;
+                if (i - k > 5) break; // Çok uzun olmasını önlemek için
+            }
+            codeBlock += lines[i].trim();
+        }
+
+        tasks.push({ content: todoContent, code: codeBlock.trim() });
+        currentCodeBlock = '';
+      }
+    }
+    setParsedTasks(tasks);
+  };
+
+  const handleAddAllParsedTasks = () => {
+    if (parsedTasks.length === 0) return;
+
+    setColumns((prevColumns) =>
+      prevColumns.map((column) => {
+        if (column.id === 'todo') {
+          const newTasks = parsedTasks.map(parsedTask => ({
+            id: nanoid(),
+            content: parsedTask.content,
+            priority: "medium" as Priority,
+            comment: parsedTask.code,
+          }));
+          const updatedTasks = sortTasksByPriority([...column.tasks, ...newTasks]);
+          return {
+            ...column,
+            tasks: updatedTasks,
+          };
+        }
+        return column;
+      })
+    );
+    // Modal'ı kapat ve state'leri temizle
+    setModalOpen(false);
+    setCodeContent("");
+    setParsedTasks([]);
+  };
 
   const handleAddTask = () => {
     if (!newTaskContent.trim()) {
@@ -178,21 +310,24 @@ export function ToDoPage() {
     const newTask = {
       id: nanoid(),
       content: newTaskContent,
-      priority: "medium" as Priority,
+      priority: newTaskPriority,
     };
 
     setColumns((prevColumns) =>
       prevColumns.map((column) => {
-        if (column.id === "todo") {
+        if (column.id === selectedColumnForNewTask) {
+          const newTasks = sortTasksByPriority([...column.tasks, newTask]);
           return {
             ...column,
-            tasks: [...column.tasks, newTask],
+            tasks: newTasks,
           };
         }
         return column;
       })
     );
     setNewTaskContent("");
+    setNewTaskPriority("medium");
+    setModalOpen(false);
   };
 
   const openDrawer = (task: Task, columnId: string) => {
@@ -212,12 +347,17 @@ export function ToDoPage() {
     updatedTaskData: Partial<Task>
   ) => {
     setColumns((prevColumns) =>
-      prevColumns.map((column) => ({
-        ...column,
-        tasks: column.tasks.map((task) =>
-          task.id === taskId ? { ...task, ...updatedTaskData } : task
-        ),
-      }))
+      prevColumns.map((column) => {
+        const newTasks = sortTasksByPriority(
+          column.tasks.map((task) =>
+            task.id === taskId ? { ...task, ...updatedTaskData } : task
+          )
+        );
+        return {
+          ...column,
+          tasks: newTasks,
+        };
+      })
     );
     if (selectedTask) {
       setSelectedTask((prev) => ({
@@ -250,7 +390,7 @@ export function ToDoPage() {
       if (!sourceColumn || !destinationColumn) return prevColumns;
 
       const newSourceTasks = sourceColumn.tasks.filter((task) => task.id !== selectedTask.id);
-      const newDestinationTasks = [...destinationColumn.tasks, selectedTask];
+      const newDestinationTasks = sortTasksByPriority([...destinationColumn.tasks, selectedTask]);
 
       return prevColumns.map((column) => {
         if (column.id === selectedTaskColumnId) {
@@ -265,30 +405,38 @@ export function ToDoPage() {
     handleClosePopover();
   };
 
-  // DEĞİŞİKLİK BURADA: Öncelik etiketlerini ve ikonlarını güncelliyoruz
   const getPriorityLabel = (priority: Priority) => {
     switch (priority) {
       case "low":
         return (
           <PriorityLabel priority="low">
-            <KeyboardDoubleArrowDownIcon /> Düşük
+            <KeyboardDoubleArrowDownIcon /> Low
           </PriorityLabel>
         );
       case "medium":
         return (
           <PriorityLabel priority="medium">
-            <DragHandleIcon /> Orta
+            <DragHandleIcon /> Medium
           </PriorityLabel>
         );
       case "high":
         return (
           <PriorityLabel priority="high">
-            <KeyboardDoubleArrowUpIcon /> Yüksek
+            <KeyboardDoubleArrowUpIcon /> High
           </PriorityLabel>
         );
       default:
         return null;
     }
+  };
+
+  const handleOpenModal = (columnId: string) => {
+    setSelectedColumnForNewTask(columnId);
+    setNewTaskContent('');
+    setNewTaskPriority('medium');
+    setParsedTasks([]);
+    setCodeContent('');
+    setModalOpen(true);
   };
 
   const isPopoverOpen = Boolean(popoverAnchorEl);
@@ -306,7 +454,7 @@ export function ToDoPage() {
           top: 0,
           left: 0,
           width: "100%",
-          zIndex: 10,
+          zIndex: 100,
           boxShadow: "0 2px 4px rgba(0,0,0,0.5)",
         }}
       >
@@ -316,7 +464,7 @@ export function ToDoPage() {
           color="#00bcd4"
           sx={{ lineHeight: "0.47", fontWeight: "bold" }}
         >
-          To-Do Listesi
+          To Do
         </Typography>
       </Box>
 
@@ -329,99 +477,86 @@ export function ToDoPage() {
           width: "100%",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            gap: "16px",
-            mb: 3,
-            maxWidth: "1200px",
-            padding: "0 32px",
-            width: "100%",
-          }}
-        >
-          <TextField
-            fullWidth
-            variant="outlined"
-            placeholder="Yeni görev ekle..."
-            value={newTaskContent}
-            onChange={(e) => setNewTaskContent(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleAddTask();
-              }
-            }}
-            sx={{
-              input: { color: "#fff" },
-              "& .MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
-              "&:hover .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#666",
-              },
-              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
-                borderColor: "#00bcd4",
-              },
-            }}
-          />
-          <Button
-            variant="contained"
-            onClick={handleAddTask}
-            disabled={!newTaskContent.trim()}
-            sx={{
-              backgroundColor: "#00bcd4",
-              "&:hover": { backgroundColor: "#0097a7" },
-              color: "#1e1e1e",
-              textTransform: "none",
-              minWidth: "120px",
-              fontWeight: "bold",
-            }}
-          >
-            Ekle
-          </Button>
-        </Box>
-
         <ColumnsContainer>
           {columns.map((column) => (
             <ColumnBox key={column.id}>
-              <Typography variant="h5" component="h2">
-                {column.title}
-              </Typography>
-              {column.tasks.length > 0 ? (
-                column.tasks.map((task) => (
-                  <TaskItem
-                    key={task.id}
-                    onClick={() => openDrawer(task, column.id)}
-                  >
-                    <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-                      <PriorityIndicator priority={task.priority} />
-                      <Box sx={{ p: "12px", display: 'flex', flexDirection: 'column' }}>
-                        <Typography variant="body1" sx={{mb: '8px'}}>{task.content}</Typography>
-                        {getPriorityLabel(task.priority)}
-                      </Box>
-                    </Box>
-                    <IconButton
-                      onClick={(e) => handleOpenPopover(e, task, column.id)}
-                      sx={{ color: "#e0e0e0" }}
-                    >
-                      <MoreHorizIcon />
-                    </IconButton>
-                  </TaskItem>
-                ))
-              ) : (
-                <Typography
-                  id={column.id}
-                  variant="body2"
-                  color="#666"
-                  textAlign="center"
-                  mt={3}
-                >
-                  Henüz görev yok.
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: "2px solid #333", paddingBottom: "12px", marginBottom: "16px" }}>
+                <Typography variant="h5" component="h2" sx={{ m: 0, p: 0, borderBottom: 'none' }}>
+                  {column.title.charAt(0).toUpperCase() + column.title.slice(1)}
                 </Typography>
-              )}
+                <IconButton sx={{ color: '#00bcd4' }} onClick={() => handleOpenModal(column.id)}>
+                  <AddIcon />
+                </IconButton>
+              </Box>
+              <Box
+                sx={{
+                  flexGrow: 1,
+                  maxHeight: '400px',
+                  overflowY: 'auto',
+                  paddingRight: '12px',
+                  '&::-webkit-scrollbar': {
+                    width: '8px',
+                  },
+                  '&::-webkit-scrollbar-thumb': {
+                    backgroundColor: '#444',
+                    borderRadius: '4px',
+                  },
+                  '&::-webkit-scrollbar-track': {
+                    backgroundColor: '#1e1e1e',
+                  },
+                }}
+              >
+                {column.tasks.length > 0 ? (
+                  sortTasksByPriority(column.tasks).map((task) => (
+                    <TaskItem
+                      key={task.id}
+                      onClick={() => openDrawer(task, column.id)}
+                    >
+                      <PriorityIndicator priority={task.priority} />
+                      <Box sx={{ display: 'flex', flexDirection: 'column', flexGrow: 1, p: "12px" }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
+                          <Typography
+                            variant="body1"
+                            sx={{
+                              flexGrow: 1,
+                              minWidth: 0,
+                              overflow: "hidden",
+                              display: "-webkit-box",
+                              WebkitLineClamp: 3,
+                              WebkitBoxOrient: "vertical",
+                              wordBreak: "break-word",
+                              pr: 2
+                            }}
+                          >
+                            {task.content}
+                          </Typography>
+                        </Box>
+                        <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-start' }}>
+                          {getPriorityLabel(task.priority)}
+                        </Box>
+                      </Box>
+                      <MoreIconWrapper onClick={(e) => handleOpenPopover(e, task, column.id)}>
+                        <MoreHorizIcon />
+                      </MoreIconWrapper>
+                    </TaskItem>
+                  ))
+                ) : (
+                  <Typography
+                    id={column.id}
+                    variant="body2"
+                    color="#666"
+                    textAlign="center"
+                    mt={3}
+                  >
+                    No tasks yet.
+                  </Typography>
+                )}
+              </Box>
             </ColumnBox>
           ))}
         </ColumnsContainer>
       </Box>
 
-      {/* Görev Taşıma Popover Menüsü */}
       <Popover
         id={popoverId}
         open={isPopoverOpen}
@@ -448,7 +583,7 @@ export function ToDoPage() {
       >
         <Box sx={{ p: 1 }}>
           <Typography variant="caption" sx={{ color: '#aaa', display: 'block', mb: 1 }}>
-            Taşı
+            Move to
           </Typography>
           {columns.map((col) => (
             selectedTaskColumnId !== col.id && (
@@ -469,7 +604,6 @@ export function ToDoPage() {
         </Box>
       </Popover>
 
-      {/* Görev Detayları Paneli */}
       <Drawer
         anchor="right"
         open={drawerOpen}
@@ -498,7 +632,7 @@ export function ToDoPage() {
               mb: 2,
             }}
           >
-            <Typography variant="h6">Görevi Düzenle</Typography>
+            <Typography variant="h6">Edit Task</Typography>
             <IconButton onClick={closeDrawer} sx={{ color: "#e0e0e0" }}>
               <CloseIcon />
             </IconButton>
@@ -506,7 +640,7 @@ export function ToDoPage() {
           {selectedTask && (
             <>
               <TextField
-                label="Görev İçeriği"
+                label="Task Content"
                 variant="outlined"
                 fullWidth
                 multiline
@@ -529,21 +663,22 @@ export function ToDoPage() {
                   },
                 }}
                 value={selectedTask.content}
-                onChange={(e) =>
-                  handleTaskUpdate(selectedTask.id, {
-                    content: e.target.value,
-                  })
-                }
+                onChange={(e) => {
+                  if (e.target.value.length <= 50) {
+                    handleTaskUpdate(selectedTask.id, { content: e.target.value });
+                  }
+                }}
+                inputProps={{ maxLength: 50 }}
               />
               <FormControl fullWidth sx={{ mb: 2 }}>
                 <InputLabel
                   sx={{ color: "#e0e0e0", "&.Mui-focused": { color: "#00bcd4" } }}
                 >
-                  Önem Sırası
+                  Priority
                 </InputLabel>
                 <Select
                   value={selectedTask.priority}
-                  label="Önem Sırası"
+                  label="Priority"
                   onChange={(e) =>
                     handleTaskUpdate(selectedTask.id, {
                       priority: e.target.value as Priority,
@@ -563,13 +698,13 @@ export function ToDoPage() {
                     "& .MuiSelect-icon": { color: "#fff" },
                   }}
                 >
-                  <MenuItem value="low">Düşük</MenuItem>
-                  <MenuItem value="medium">Orta</MenuItem>
-                  <MenuItem value="high">Yüksek</MenuItem>
+                  <MenuItem value="low">Low</MenuItem>
+                  <MenuItem value="medium">Medium</MenuItem>
+                  <MenuItem value="high">High</MenuItem>
                 </Select>
               </FormControl>
               <TextField
-                label="Yorum"
+                label="Comment"
                 variant="outlined"
                 fullWidth
                 multiline
@@ -602,6 +737,168 @@ export function ToDoPage() {
           )}
         </Box>
       </Drawer>
+
+      <Modal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        closeAfterTransition
+      >
+        <Fade in={modalOpen} timeout={300}>
+          <Box sx={{
+            width: { xs: '90%', md: 700 },
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            p: 4,
+            backgroundColor: '#1a1a1a',
+            color: '#e0e0e0',
+            borderRadius: '12px',
+            boxShadow: '0 8px 25px rgba(0,0,0,0.5)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 3,
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            border: '1px solid #333',
+            "&::-webkit-scrollbar": {
+              width: "12px",
+            },
+            "&::-webkit-scrollbar-track": {
+              backgroundColor: "#1a1a1a",
+            },
+            "&::-webkit-scrollbar-thumb": {
+              backgroundColor: "#444",
+              borderRadius: "10px",
+              border: "3px solid #1a1a1a",
+            },
+          }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+              <Typography variant="h5" component="h2" sx={{ color: '#00bcd4' }}>
+                Add New Task
+              </Typography>
+              <IconButton onClick={() => setModalOpen(false)} sx={{ color: '#e0e0e0' }}>
+                <CloseIcon />
+              </IconButton>
+            </Box>
+
+            <Box>
+              <Typography variant="body1" sx={{ mb: 1, color: '#aaa' }}>
+                Paste your code here to automatically find **Todo** and **To-do** comments.
+              </Typography>
+              <TextField
+                label="Code Snippet"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={6}
+                value={codeContent}
+                onChange={(e) => {
+                  setCodeContent(e.target.value);
+                  handleParseCode(e.target.value);
+                }}
+                sx={{
+                  "& .MuiInputBase-input": {
+                    color: "#fff",
+                    fontFamily: 'monospace',
+                    "&::-webkit-scrollbar": {
+                      width: "8px",
+                    },
+                    "&::-webkit-scrollbar-track": {
+                      backgroundColor: "#2a2a2a",
+                    },
+                    "&::-webkit-scrollbar-thumb": {
+                      backgroundColor: "#666",
+                      borderRadius: "4px",
+                    },
+                  },
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#666" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#00bcd4" },
+                  "& .MuiInputLabel-root": { color: "#e0e0e0" },
+                  "& .MuiInputLabel-root.Mui-focused": { color: "#00bcd4" },
+                }}
+              />
+            </Box>
+
+            {parsedTasks.length > 0 && (
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <Typography variant="h6" sx={{ color: '#00bcd4' }}>
+                  Found Tasks ({parsedTasks.length})
+                </Typography>
+                <Button
+                  variant="contained"
+                  onClick={handleAddAllParsedTasks}
+                  startIcon={<AddIcon />}
+                  sx={{
+                    backgroundColor: "#00bcd4",
+                    "&:hover": { backgroundColor: "#0097a7" },
+                    color: "#1e1e1e",
+                    fontWeight: 'bold',
+                  }}
+                >
+                  Add All Tasks
+                </Button>
+                <Box sx={{ borderBottom: '1px dashed #444', my: 1 }} />
+              </Box>
+            )}
+
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <Typography variant="h6" sx={{ color: '#00bcd4' }}>
+                Create Task Manually
+              </Typography>
+              <TextField
+                label="Task Content"
+                variant="outlined"
+                fullWidth
+                multiline
+                rows={2}
+                value={newTaskContent}
+                onChange={(e) => setNewTaskContent(e.target.value)}
+                sx={{
+                  "& .MuiInputBase-input": { color: "#fff" },
+                  "& .MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
+                  "&:hover .MuiOutlinedInput-notchedOutline": { borderColor: "#666" },
+                  "&.Mui-focused .MuiOutlinedInput-notchedOutline": { borderColor: "#00bcd4" },
+                  "& .MuiInputLabel-root": { color: "#e0e0e0" },
+                  "& .MuiInputLabel-root.Mui-focused": { color: "#00bcd4" },
+                }}
+              />
+              <FormControl fullWidth>
+                <InputLabel sx={{ color: "#e0e0e0" }}>Priority</InputLabel>
+                <Select
+                  value={newTaskPriority}
+                  label="Priority"
+                  onChange={(e) => setNewTaskPriority(e.target.value as Priority)}
+                  sx={{
+                    color: "#fff",
+                    "& .MuiOutlinedInput-notchedOutline": { borderColor: "#444" },
+                    "& .MuiSelect-icon": { color: "#fff" },
+                  }}
+                >
+                  <MenuItem value="low">Low</MenuItem>
+                  <MenuItem value="medium">Medium</MenuItem>
+                  <MenuItem value="high">High</MenuItem>
+                </Select>
+              </FormControl>
+              <Button
+                variant="contained"
+                onClick={handleAddTask}
+                disabled={!newTaskContent.trim()}
+                startIcon={<AddIcon />}
+                sx={{
+                  backgroundColor: "#00bcd4",
+                  "&:hover": { backgroundColor: "#0097a7" },
+                  color: "#1e1e1e",
+                  fontWeight: 'bold',
+                }}
+              >
+                Add Task
+              </Button>
+            </Box>
+          </Box>
+        </Fade>
+      </Modal>
     </ToDoPageWrapper>
   );
 }
